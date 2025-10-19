@@ -1,13 +1,17 @@
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import  YearInReview  from "@/components/year-in-review"
+import { redirect } from "next/navigation";
+import YearInReview from "@/components/year-in-review";
+import { auth } from "@/lib/auth";
 
 export default async function YearInReviewPage() {
-    const session = await auth()
+  const session = await auth();
 
-    if (!session) {
-        redirect("/")
-    }
+  if (!session) {
+    redirect("/");
+  }
 
-    return <YearInReview accessToken={session.accessToken!} />
+  if (!session.accessToken) {
+    redirect("/");
+  }
+
+  return <YearInReview accessToken={session.accessToken} />;
 }
