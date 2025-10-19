@@ -1,0 +1,60 @@
+# Name of the workflow (shows up in GitHub Actions tab)
+name: CI Pipeline
+
+# When should this run?
+on:
+  push:
+    branches: [main, develop]  # Run on pushes to main or develop
+  pull_request:
+    branches: [main]            # Run on PRs to main
+
+# Define the jobs
+jobs:
+  # Job 1: Quality Checks
+  quality-check:
+    # What OS to run on
+    runs-on: ubuntu-latest
+    
+    # The steps to execute
+    steps:
+      # Step 1: Get the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Bun
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      
+      # Step 4: Run linter
+      - name: Run Biome linter
+        run: bun run lint
+        continue-on-error: false  # Fail the build if linting fails
+      
+      # Step 5: Check TypeScript types
+      - name: Type check
+        run: bunx tsc --noEmit
+      
+      # Step 6: Try building the project
+      - name: Build project
+        run: bun run build
+        env:
+          # Use GitHub secrets for sensitive data
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: http://localhost:3000
+      
+      # Step 7: Report status
+      - name: Report success
+        if: success()
+        run: echo "✅ All checks passed!"
+
+      - name: Report failure
+        if: failure()
+        run: echo "❌ Checks failed. Please fix the issues."
