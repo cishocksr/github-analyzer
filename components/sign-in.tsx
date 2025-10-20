@@ -1,13 +1,8 @@
-import { signIn } from "@/lib/auth";
+import { signInAction } from "@/lib/actions";
 
 export function SignIn() {
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signIn("github", { redirectTo: "/dashboard" });
-      }}
-    >
+    <form action={signInAction}>
       <button
         type="submit"
         className="px-8 py-4 bg-white text-gray-900 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 flex items-center gap-3 mx-auto"
