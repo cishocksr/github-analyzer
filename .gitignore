@@ -42,3 +42,5 @@ yarn-error.log*
 next-env.d.ts
 
 WARP.md
+
+ARCHITECTURE_BLOG_POST.md
